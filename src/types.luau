@@ -38,10 +38,13 @@ type Packet<T> = {
 	sendToAll: (data: T) -> (),
 	sendTo: (data: T, target: Player) -> (),
 	sendToList: (data: T, targets: { Player }) -> (),
+	sendToLists: (data: T, targets: {{ Player }}) -> (),
 
 	wait: () -> T,
 	send: (data: T, target: Player?) -> (),
 	listen: (callback: (data: T, player: Player?) -> ()) -> (),
+	-- only available on server
+	slisten: (callback: (data: T, player: Player) -> ()) -> (),
 }
 
 -- Library type

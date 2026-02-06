@@ -42,10 +42,10 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 	setmetatable(exported, {
 		__index = function(index)
 			if
-				(index == "sendTo" or index == "sendToAllExcept" or index == "sendToAll")
+				(index == "sendTo" or index == "sendToAllExcept" or index == "sendToAll" or index == "slisten")
 				and moduleRunContext == "client"
 			then
-				error("You cannot use sendTo, sendToAllExcept, or sendToAll on the client")
+				error("You cannot use sendTo, sendToAllExcept, sendToAll, or slisten on the client")
 			elseif index == "send" and moduleRunContext == "server" then
 				error("You cannot use send on the server")
 			end
@@ -60,6 +60,20 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 			for _, player in players do
 				serverSendFunction(player, id, writer, data)
 			end
+		end
+
+		local check = {}
+		function exported.sendToLists(data, players: {{ Player }})
+			local _check = check
+			for _, list in players do
+				for _, player in list do
+					if not _check[player] then
+						_check[player] = true
+						serverSendFunction(player, id, writer, data)
+					end
+				end
+			end
+			table.clear(_check)
 		end
 
 		function exported.sendTo(data, player: Player)
@@ -103,6 +117,10 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 	end
 
 	function exported.listen(callback)
+		table.insert(listeners, callback)
+	end
+
+	function exported.slisten(callback)
 		table.insert(listeners, callback)
 	end
 
